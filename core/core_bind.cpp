@@ -1932,6 +1932,23 @@ uint64_t Engine::get_process_frames() const {
 	return ::Engine::get_singleton()->get_process_frames();
 }
 
+double Engine::get_delta() {
+	return ::Engine::get_singleton()->get_delta();
+}
+
+double Engine::get_unscaled_delta() {
+	return ::Engine::get_singleton()->get_unscaled_delta();
+}
+
+double Engine::get_physics_delta() {
+	return ::Engine::get_singleton()->get_physics_delta();
+}
+
+double Engine::get_unscaled_physics_delta() {
+	return ::Engine::get_singleton()->get_unscaled_physics_delta();
+}
+
+
 void Engine::set_time_scale(double p_scale) {
 	::Engine::get_singleton()->set_time_scale(p_scale);
 }
@@ -2096,6 +2113,11 @@ void Engine::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_physics_interpolation_fraction"), &Engine::get_physics_interpolation_fraction);
 	ClassDB::bind_method(D_METHOD("set_max_fps", "max_fps"), &Engine::set_max_fps);
 	ClassDB::bind_method(D_METHOD("get_max_fps"), &Engine::get_max_fps);
+
+	ClassDB::bind_method(D_METHOD("get_delta"), &Engine::get_delta);
+	ClassDB::bind_method(D_METHOD("get_unscaled_delta"), &Engine::get_unscaled_delta);
+	ClassDB::bind_method(D_METHOD("get_physics_delta"), &Engine::get_physics_delta);
+	ClassDB::bind_method(D_METHOD("get_unscaled_physics_delta"), &Engine::get_unscaled_physics_delta);
 
 	ClassDB::bind_method(D_METHOD("set_time_scale", "time_scale"), &Engine::set_time_scale);
 	ClassDB::bind_method(D_METHOD("get_time_scale"), &Engine::get_time_scale);

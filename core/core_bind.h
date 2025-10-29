@@ -594,6 +594,11 @@ public:
 
 	int get_frames_drawn();
 
+	double get_delta();
+	double get_unscaled_delta();
+	double get_physics_delta();
+	double get_unscaled_physics_delta();
+
 	void set_time_scale(double p_scale);
 	double get_time_scale();
 
