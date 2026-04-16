@@ -36,6 +36,7 @@
 #include "core/object/class_db.h" // IWYU pragma: keep. `ADD_SIGNAL` macro.
 #include "core/os/os.h"
 #include "editor/docks/inspector_dock.h"
+#include "editor/editor_interface.h"
 #include "editor/editor_main_screen.h"
 #include "editor/editor_node.h"
 #include "editor/editor_string_names.h"
@@ -53,6 +54,7 @@
 #include "scene/gui/popup_menu.h"
 #include "scene/gui/tab_bar.h"
 #include "scene/gui/texture_rect.h"
+#include "servers/display/display_server.h"
 
 void EditorSceneTabs::_notification(int p_what) {
 	switch (p_what) {
@@ -449,6 +451,44 @@ void EditorSceneTabs::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("tab_closed", PropertyInfo(Variant::INT, "tab_index")));
 }
 
+void EditorSceneTabs::_scene_tab_add_button_gui_input(const Ref<InputEvent> &p_event) {
+	Ref<InputEventMouseButton> mb = p_event;
+
+	if (mb.is_valid() && mb->is_pressed()) {
+		EditorNode *editor = EditorNode::get_singleton();
+		switch (mb->get_button_index()) {
+			case MouseButton::LEFT:
+				print_line("left mouse button");
+				editor->trigger_menu_option(EditorNode::SCENE_NEW_SCENE, false);
+				break;
+
+			case MouseButton::RIGHT:
+				print_line("right mouse button");
+				scene_tabs_context_menu->clear();
+				scene_tabs_context_menu->reset_size();
+
+				scene_tabs_context_menu->add_shortcut(ED_GET_SHORTCUT("editor/quick_open_scene"), EditorNode::SCENE_QUICK_OPEN_SCENE);
+				scene_tabs_context_menu->add_shortcut(ED_GET_SHORTCUT("editor/open_scene"), EditorNode::SCENE_OPEN_SCENE);
+				scene_tabs_context_menu->set_position(scene_tab_add->get_screen_position() + mb->get_position());
+				scene_tabs_context_menu->reset_size();
+				scene_tabs_context_menu->popup();
+				scene_tab_add->set_pressed(false);
+				scene_tab_add->accept_event();
+				break;
+
+			case MouseButton::MIDDLE:
+				print_line("middle mouse button");
+				String path = DisplayServer::get_singleton()->clipboard_get();
+				if (ResourceLoader::exists(path)) {
+					EditorInterface::get_singleton()->open_scene_from_path(path);
+					scene_tab_add->set_pressed(false);
+					scene_tab_add->accept_event();
+				}
+				break;
+		}
+	}
+}
+
 EditorSceneTabs::EditorSceneTabs() {
 	singleton = this;
 
@@ -486,8 +526,9 @@ EditorSceneTabs::EditorSceneTabs() {
 	scene_tab_add = memnew(Button);
 	scene_tab_add->set_flat(true);
 	scene_tab_add->set_tooltip_text(TTR("Add a new scene."));
+	scene_tab_add->set_button_mask(MouseButtonMask::LEFT | MouseButtonMask::RIGHT | MouseButtonMask::MIDDLE);
 	scene_tabs->add_child(scene_tab_add);
-	scene_tab_add->connect(SceneStringName(pressed), callable_mp(EditorNode::get_singleton(), &EditorNode::trigger_menu_option).bind(EditorNode::SCENE_NEW_SCENE, false));
+	scene_tab_add->connect(SceneStringName(gui_input), callable_mp(this, &EditorSceneTabs::_scene_tab_add_button_gui_input));
 
 	scene_tab_add_ph = memnew(Control);
 	scene_tab_add_ph->set_mouse_filter(Control::MOUSE_FILTER_IGNORE);
