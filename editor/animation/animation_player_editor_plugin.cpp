@@ -36,6 +36,7 @@
 #include "core/object/class_db.h"
 #include "core/os/keyboard.h"
 #include "core/os/os.h"
+#include "core/string/print_string.h"
 #include "editor/animation/animation_tree_editor_plugin.h"
 #include "editor/docks/editor_dock_manager.h"
 #include "editor/docks/inspector_dock.h"
@@ -344,7 +345,10 @@ void AnimationPlayerEditor::_play_pressed() {
 void AnimationPlayerEditor::_play_from_pressed() {
 	String current = _get_current();
 
-	if (!current.is_empty()) {
+	if (player->is_playing() && player->get_playing_speed() > 0) {
+		player->pause();
+		return;
+	} else if (!current.is_empty()) {
 		if (!player->is_valid()) {
 			_play_pressed(); // Fallback.
 			return;
@@ -364,7 +368,6 @@ void AnimationPlayerEditor::_play_from_pressed() {
 			player->play(current);
 		}
 	}
-
 	//unstop
 	stop->set_button_icon(pause_icon);
 }
@@ -399,8 +402,10 @@ void AnimationPlayerEditor::_play_bw_pressed() {
 
 void AnimationPlayerEditor::_play_bw_from_pressed() {
 	String current = _get_current();
-
-	if (!current.is_empty()) {
+	if (player->is_playing() && player->get_playing_speed() < 0) {
+		player->pause();
+		return;
+	} else if (!current.is_empty()) {
 		if (!player->is_valid()) {
 			_play_bw_pressed(); // Fallback.
 			return;
@@ -1226,7 +1231,7 @@ void AnimationPlayerEditor::_update_name_dialog_library_dropdown() {
 }
 
 void AnimationPlayerEditor::_update_playback_tooltips() {
-	stop->set_tooltip_text(TTR("Pause/Stop Animation") + " (" + ED_GET_SHORTCUT("animation_editor/stop_animation")->get_as_text() + ")");
+	stop->set_tooltip_text(TTR("Stop Animation") + " (" + ED_GET_SHORTCUT("animation_editor/stop_animation")->get_as_text() + ")");
 	play->set_tooltip_text(TTR("Play Animation from Start") + " (" + ED_GET_SHORTCUT("animation_editor/play_animation_from_start")->get_as_text() + ")");
 	play_from->set_tooltip_text(TTR("Play Animation") + " (" + ED_GET_SHORTCUT("animation_editor/play_animation")->get_as_text() + ")");
 	play_bw_from->set_tooltip_text(TTR("Play Animation Backwards") + " (" + ED_GET_SHORTCUT("animation_editor/play_animation_backwards")->get_as_text() + ")");
@@ -2332,7 +2337,7 @@ void fragment() {
 )");
 	RS::get_singleton()->material_set_shader(onion.capture.material->get_rid(), onion.capture.shader->get_rid());
 
-	ED_SHORTCUT("animation_editor/stop_animation", TTRC("Pause/Stop Animation"), Key::S, true);
+	ED_SHORTCUT("animation_editor/stop_animation", TTRC("Stop Animation"), Key::S, true);
 	ED_SHORTCUT("animation_editor/play_animation", TTRC("Play Animation"), Key::D, true);
 	ED_SHORTCUT("animation_editor/play_animation_backwards", TTRC("Play Animation Backwards"), Key::A, true);
 	ED_SHORTCUT("animation_editor/play_animation_from_start", TTRC("Play Animation from Start"), KeyModifierMask::SHIFT + Key::D, true);
