@@ -764,7 +764,7 @@ float DisplayServerWayland::screen_get_refresh_rate(int p_screen) const {
 }
 
 bool DisplayServerWayland::is_touchscreen_available() const {
-	MutexLock mutex_lock(wayland_thread.mutex);
+	return false;
 
 	return wayland_thread.input_has_touch() || (Input::get_singleton() && Input::get_singleton()->is_emulating_touch_from_mouse());
 }
