@@ -836,6 +836,7 @@ namespace GodotTools
         {
             if (Internal.IsAssembliesReloadingNeeded())
             {
+	            ScriptDoc.ClearXmlCache();
                 BuildManager.UpdateLastValidBuildDateTime();
                 Internal.ReloadAssemblies(softReload: false);
             }
